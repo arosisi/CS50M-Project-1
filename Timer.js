@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Button, Text, View } from "react-native";
+import PropTypes from "prop-types";
 
 import { vibrate } from "./utils";
 
@@ -20,9 +21,6 @@ const styles = StyleSheet.create({
   }
 });
 
-const SECS_FOR_WORK = 25 * 60;
-const SECS_FOR_REST = 5 * 60;
-
 STATUSES = {
   NOT_STARTED: "NOT_STARTED",
   STARTED: "STARTED",
@@ -30,12 +28,32 @@ STATUSES = {
 };
 
 export default class Timer extends React.Component {
+  static propTypes = {
+    secsForWork: PropTypes.number.isRequired,
+    secsForRest: PropTypes.number.isRequired
+  };
+
   state = {
-    secsForWork: SECS_FOR_WORK,
-    secsForRest: SECS_FOR_REST,
+    secsForWork: this.props.secsForWork,
+    secsForRest: this.props.secsForRest,
     status: STATUSES.NOT_STARTED,
     isManagingWorkTime: true
   };
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.secsForWork !== this.props.secsForWork ||
+      prevProps.secsForRest !== this.props.secsForRest
+    ) {
+      this.stopTimer();
+      this.setState({
+        secsForWork: this.props.secsForWork,
+        secsForRest: this.props.secsForRest,
+        status: STATUSES.NOT_STARTED,
+        isManagingWorkTime: true
+      });
+    }
+  }
 
   componentWillUnmount() {
     this.stopTimer();
@@ -44,8 +62,8 @@ export default class Timer extends React.Component {
   resetTimer = () => {
     this.stopTimer();
     this.setState({
-      secsForWork: SECS_FOR_WORK,
-      secsForRest: SECS_FOR_REST,
+      secsForWork: this.props.secsForWork,
+      secsForRest: this.props.secsForRest,
       isManagingWorkTime: true
     });
   };
@@ -93,7 +111,7 @@ export default class Timer extends React.Component {
       if (!secsForWork) {
         this.setState(
           {
-            secsForWork: SECS_FOR_WORK,
+            secsForWork: this.props.secsForWork,
             isManagingWorkTime: false
           },
           this.startTimer
@@ -104,7 +122,7 @@ export default class Timer extends React.Component {
       if (!secsForRest) {
         this.setState(
           {
-            secsForRest: SECS_FOR_REST,
+            secsForRest: this.props.secsForRest,
             isManagingWorkTime: true
           },
           this.startTimer
@@ -147,6 +165,7 @@ export default class Timer extends React.Component {
           />
           <Button
             title='Stop'
+            color='#F37E21'
             disabled={status !== STATUSES.STARTED}
             onPress={() =>
               this.setState({ status: STATUSES.PAUSED }, this.stopTimer)
@@ -154,6 +173,7 @@ export default class Timer extends React.Component {
           />
           <Button
             title='Reset'
+            color='#F37E21'
             disabled={status === STATUSES.NOT_STARTED}
             onPress={() =>
               this.setState({ status: STATUSES.NOT_STARTED }, this.resetTimer)
