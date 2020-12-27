@@ -47,19 +47,9 @@ export default class Settings extends React.Component {
     secsForRest: this.props.secsForRest
   };
 
-  componentDidUpdate(prevProps) {
-    if (
-      prevProps.secsForWork !== this.props.secsForWork ||
-      prevProps.secsForRest !== this.props.secsForRest
-    ) {
-      this.setState({
-        secsForWork: this.props.secsForWork,
-        secsForRest: this.props.secsForRest
-      });
-    }
-  }
+  closeSettingsModal = () => this.setState({ showSettingsModal: false });
 
-  closeSettingsModal = () =>
+  closeSettingsModalAndReset = () =>
     this.setState({
       showSettingsModal: false,
       secsForWork: this.props.secsForWork,
@@ -92,7 +82,7 @@ export default class Settings extends React.Component {
         <Modal
           transparent={true}
           visible={this.state.showSettingsModal}
-          onRequestClose={this.closeSettingsModal}
+          onRequestClose={this.closeSettingsModalAndReset}
         >
           <View style={styles.modalContainer}>
             <View style={styles.modal}>
@@ -116,7 +106,7 @@ export default class Settings extends React.Component {
                 <Button
                   title='Cancel'
                   color='#7B7B7B'
-                  onPress={this.closeSettingsModal}
+                  onPress={this.closeSettingsModalAndReset}
                 />
                 <Button
                   title='Save'
