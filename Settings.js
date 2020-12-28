@@ -34,6 +34,8 @@ const styles = StyleSheet.create({
   }
 });
 
+const secsToMins = secs => (secs / 60).toString();
+
 export default class Settings extends React.Component {
   static propTypes = {
     secsForWork: PropTypes.number.isRequired,
@@ -43,8 +45,8 @@ export default class Settings extends React.Component {
 
   state = {
     showSettingsModal: false,
-    secsForWork: this.props.secsForWork,
-    secsForRest: this.props.secsForRest
+    minsForWork: secsToMins(this.props.secsForWork),
+    minsForRest: secsToMins(this.props.secsForRest)
   };
 
   closeSettingsModal = () => this.setState({ showSettingsModal: false });
@@ -52,22 +54,24 @@ export default class Settings extends React.Component {
   closeSettingsModalAndReset = () =>
     this.setState({
       showSettingsModal: false,
-      secsForWork: this.props.secsForWork,
-      secsForRest: this.props.secsForRest
+      minsForWork: secsToMins(this.props.secsForWork),
+      minsForRest: secsToMins(this.props.secsForRest)
     });
 
-  setSecsForWork = text => {
-    const mins = parseInt(text) || 0;
-    this.setState({ secsForWork: mins * 60 });
+  setMinsForWork = text => {
+    if (!text || text.match(/^[1-9]+[0-9]*$/)) {
+      this.setState({ minsForWork: text });
+    }
   };
 
-  setSecsForRest = text => {
-    const mins = parseInt(text) || 0;
-    this.setState({ secsForRest: mins * 60 });
+  setMinsForRest = text => {
+    if (!text || text.match(/^[1-9]+[0-9]*$/)) {
+      this.setState({ minsForRest: text });
+    }
   };
 
   render() {
-    const { secsForWork, secsForRest } = this.state;
+    const { minsForWork, minsForRest } = this.state;
     return (
       <View>
         <FontAwesome.Button
@@ -90,16 +94,16 @@ export default class Settings extends React.Component {
               <TextInput
                 style={styles.input}
                 keyboardType='number-pad'
-                onChangeText={this.setSecsForWork}
-                value={(secsForWork / 60 || "").toString()}
+                onChangeText={this.setMinsForWork}
+                value={minsForWork}
               />
 
               <Text>Rest duration in mins:</Text>
               <TextInput
                 style={styles.input}
                 keyboardType='number-pad'
-                onChangeText={this.setSecsForRest}
-                value={(secsForRest / 60 || "").toString()}
+                onChangeText={this.setMinsForRest}
+                value={minsForRest}
               />
 
               <View style={styles.buttons}>
@@ -110,9 +114,12 @@ export default class Settings extends React.Component {
                 />
                 <Button
                   title='Save'
-                  disabled={!secsForWork || !secsForRest}
+                  disabled={!minsForWork || !minsForRest}
                   onPress={() => {
-                    this.props.setDurations(secsForWork, secsForRest);
+                    this.props.setDurations(
+                      parseInt(minsForWork) * 60,
+                      parseInt(minsForRest) * 60
+                    );
                     this.closeSettingsModal();
                   }}
                 />
